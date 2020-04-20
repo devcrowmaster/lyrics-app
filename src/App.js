@@ -3,12 +3,14 @@ import Form from './components/Form';
 
 import axios from 'axios';
 import Song from './components/Song';
+import InfoArtist from './components/InfoArtist';
 
 function App() {
 
   const [searchSong, setSearchSong] = useState({});
 
   const [letter, setLetter] = useState('');
+  const [infoArtist, setInfoArtist] = useState({});
 
   useEffect(()=>{
     if(Object.keys(searchSong).length === 0) return; //Verifica que la primera peticion no aga nada
@@ -19,18 +21,24 @@ function App() {
       const urlLetter = `https://api.lyrics.ovh/v1/${artist}/${song}`;
       const urlArtist = `https://www.theaudiodb.com/api/v1/json/1/search.php?s=${artist}`;
 
-      //PROBLEMA: ESTO HACE QUE PRIMERO SE OBTENGA LA PETICION DE LETRAS LUEGO CUANDO ACABE SE EJECUTA LA DE ARTISTA
-      const result = await axios(urlLetter)  //axios.get(url);
-      const result2 = await axios(urlArtist)  //axios.get(url);
+      //Esto ejecuta las peticiones en simultaneo
+      const [letter,infoArtist] = await Promise.all([
+        axios(urlLetter),
+        axios(urlArtist)
+      ])
 
-      // console.log(result);
-      // console.log(result.data.lyrics);
-      setLetter(result.data.lyrics);
+      // console.log(letter)
+      // console.log(infoArtist)
+      // console.log(letter.data.lyrics)
+      // console.log(infoArtist.data.artists[0])
+
+      setLetter(letter.data.lyrics);
+      setInfoArtist(infoArtist.data.artists[0]);
 
     }
     consultApiLetra()
 
-  },[searchSong])
+  },[searchSong,infoArtist])
 
   return (
     <Fragment>
@@ -39,7 +47,11 @@ function App() {
       />
       <div className="container mt-5">
         <div className="row">
-          <div className="col-md-6"></div>
+          <div className="col-md-6">
+            <InfoArtist
+              infoArtist={infoArtist}
+            />
+          </div>
           <div className="col-md-6">
             <Song
               letter={letter}

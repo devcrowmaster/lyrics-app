@@ -1,5 +1,6 @@
 import React from 'react';
 import { useState } from 'react';
+import PropTypes from 'prop-types';
 
 const Form = ({setSearchSong}) => {
 
@@ -94,5 +95,10 @@ const Form = ({setSearchSong}) => {
     </div>  
   );
 }
- 
+
+
+Form.propTypes = {
+  setSearchSong: PropTypes.func.isRequired
+}
+
 export default Form;
